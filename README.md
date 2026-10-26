@@ -77,6 +77,49 @@ The first run requires internet access to the public USGS API and may install mi
 - PELT change-point screening on seasonally adjusted anomalies
 - Seasonal ARIMA forecast compared with seasonal-naive baseline using a chronological holdout
 - Robust anomaly screening using median absolute deviation
+  
+## Results from the October 2026 analysis
+
+The workflow was successfully executed using publicly available daily discharge observations from USGS monitoring site `01491000` (Choptank River near Greensboro, Maryland).
+
+**Data coverage:** 28,788 daily observations were retrieved for the period January 1, 1948, to October 26, 2026. The final year is incomplete and should be interpreted accordingly.
+
+### Seasonal patterns
+
+River discharge exhibits pronounced seasonality, with generally higher monthly discharge in late winter and early spring and lower discharge during late summer and early autumn. Daily observations also show substantial variability and occasional high-flow events.
+
+### Long-term trend
+
+The Mann–Kendall test on annual mean discharge produced a positive but statistically non-significant trend at the 5% significance level:
+
+- Mann–Kendall tau: **0.1282**
+- p-value: **0.09533**
+- Sen's slope: **+0.45115 discharge units per year**
+
+These results suggest a weak positive tendency, but do not provide sufficient evidence to conclude that a statistically significant monotonic trend exists at the conventional 5% threshold.
+
+### Change-point screening
+
+The PELT-based screening procedure did not select any candidate change points in the seasonally adjusted monthly series under the settings used. This does not rule out gradual changes or shifts detectable using alternative methods.
+
+### Forecast evaluation
+
+A seasonal ARIMA model was evaluated against a seasonal-naive baseline using a chronological holdout period.
+
+| Model | MAE | RMSE | MAPE |
+|---|---:|---:|---:|
+| Seasonal-naive baseline | 145.0 | 225.0 | 368% |
+| Auto ARIMA/SARIMA | 70.5 | 81.2 | 249% |
+
+The ARIMA/SARIMA model achieved lower prediction errors than the baseline, although forecast accuracy remained limited during periods of strong discharge variability. Percentage-based errors should be interpreted cautiously when observed discharge is close to zero.
+
+### Anomaly screening
+
+Robust anomaly screening highlighted a small number of unusual monthly observations relative to the estimated seasonal and long-term patterns. These observations are statistical flags requiring further investigation, not confirmed flood events or evidence of particular environmental causes.
+
+### Scientific scope
+
+This analysis demonstrates reproducible hydrological time-series methods using one USGS monitoring location. The findings should not be interpreted as direct evidence of biodiversity change, ecological degradation, or climate-change causation. Further analyses would require appropriate environmental covariates, station-history checks, and biodiversity observations.
 
 ## Interpretation cautions
 
@@ -95,5 +138,4 @@ The first run requires internet access to the public USGS API and may install mi
 
 1. Run the pipeline and inspect every figure and result.
 2. Read `notes/UNDER_THE_HOOD.md` before presenting any conclusion.
-3. Replace this README's placeholder summary with the actual results produced by your run.
-4. Add a biodiversity/eDNA dataset only after confirming that it has repeated observations over enough dates and that the sampling design is understood.
+3. Add a biodiversity/eDNA dataset only after confirming that it has repeated observations over enough dates and that the sampling design is understood.
