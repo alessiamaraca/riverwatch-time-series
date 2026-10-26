@@ -1,5 +1,7 @@
 # RiverWatch: Reproducible Time-Series Analysis of USGS River Discharge
 
+[![R project checks](https://github.com/alessiamaraca/riverwatch-time-series/actions/workflows/r-check.yml/badge.svg)](https://github.com/alessiamaraca/riverwatch-time-series/actions/workflows/r-check.yml)
+
 **A portfolio project in R covering ecological time-series methods, trend detection, change points, anomaly screening, and forecasting.**
 
 > **Scope note:** This first version analyses river discharge, not biodiversity. Discharge is an important hydrological variable, but it is not a direct measure of species richness or ecological condition. The workflow is designed to be reusable later with a real biodiversity/eDNA time series.
