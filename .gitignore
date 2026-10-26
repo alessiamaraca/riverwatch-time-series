@@ -11,5 +11,8 @@ renv/staging/
 # Keep downloaded public data out of git by default; publish only if file size/licensing allow.
 data/raw/*.csv
 data/processed/*.csv
-outputs/
-!outputs/.gitkeep
+outputs/*
+!outputs/figures/
+outputs/figures/*
+!outputs/figures/*.png
+
