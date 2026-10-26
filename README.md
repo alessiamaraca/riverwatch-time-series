@@ -121,6 +121,20 @@ Robust anomaly screening highlighted a small number of unusual monthly observati
 
 This analysis demonstrates reproducible hydrological time-series methods using one USGS monitoring location. The findings should not be interpreted as direct evidence of biodiversity change, ecological degradation, or climate-change causation. Further analyses would require appropriate environmental covariates, station-history checks, and biodiversity observations.
 
+## Selected visualizations
+
+### Monthly seasonality
+
+![Monthly seasonality](outputs/figures/02_monthly_seasonality.png)
+
+### Annual discharge trend
+
+![Annual discharge trend](outputs/figures/03_annual_trend.png)
+
+### Forecast evaluation
+
+![Forecast comparison](outputs/figures/06_forecast_holdout.png)
+
 ## Interpretation cautions
 
 - A detected trend is not automatically an ecological impact.
