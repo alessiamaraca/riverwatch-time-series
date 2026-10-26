@@ -1,0 +1,11 @@
+# Run all steps from the repository root.
+source("R/00_setup.R")
+source("R/01_download_data.R")
+source("R/02_prepare_data.R")
+source("R/03_exploration.R")
+source("R/04_trend_analysis.R")
+source("R/05_change_points.R")
+source("R/06_forecasting.R")
+source("R/07_anomalies.R")
+source("R/08_make_summary.R")
+message("Pipeline finished. Review outputs/ and report/analysis_report.qmd.")

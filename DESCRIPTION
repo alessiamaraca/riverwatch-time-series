@@ -1,0 +1,9 @@
+Package: riverwatch
+Title: RiverWatch USGS River Discharge Time-Series Analysis
+Version: 0.1.0
+Authors@R: person("RiverWatch", "Project", role = c("aut", "cre"), email = "your-email@example.com")
+Description: Reproducible analysis workflow for public USGS daily discharge
+    observations, including seasonality, trend analysis, candidate change points,
+    anomaly screening, and out-of-sample ARIMA forecasting.
+License: MIT
+Encoding: UTF-8

@@ -1,0 +1,130 @@
+---
+title: "RiverWatch: USGS River Discharge Time-Series Analysis"
+subtitle: "Seasonality, trend detection, candidate change points, and forecasting"
+author: "RiverWatch portfolio project"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    embed-resources: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+## Executive summary
+
+This report analyses public daily mean discharge observations from USGS site `USGS-01491000` (Choptank River near Greensboro, Maryland). It demonstrates a reproducible time-series workflow. It does **not** directly measure biodiversity, and it should not be interpreted as a biodiversity assessment.
+
+Run `source("run_all.R")` from the repository root before rendering this report.
+
+## Data and provenance
+
+```{r}
+manifest_path <- "../outputs/tables/data_manifest.csv"
+if (!file.exists(manifest_path)) manifest_path <- "outputs/tables/data_manifest.csv"
+if (file.exists(manifest_path)) {
+  knitr::kable(readr::read_csv(manifest_path, show_col_types = FALSE))
+} else {
+  cat("Data manifest not found. Run the pipeline first.")
+}
+```
+
+The data are retrieved from the USGS Water Data API using the USGS-maintained `dataRetrieval` package. The raw download is retained separately from processed tables so the analysis can be audited.
+
+## Data quality
+
+```{r}
+qc_path <- "../outputs/tables/quality_checks.csv"
+if (!file.exists(qc_path)) qc_path <- "outputs/tables/quality_checks.csv"
+if (file.exists(qc_path)) knitr::kable(readr::read_csv(qc_path, show_col_types = FALSE))
+```
+
+Review missingness and changes in sampling/record coverage before interpreting trends. Monthly and annual averages smooth short-term extremes.
+
+## Seasonal structure
+
+```{r}
+fig <- "../outputs/figures/02_monthly_seasonality.png"
+if (file.exists(fig)) knitr::include_graphics(fig) else cat("Run the pipeline to generate the seasonal plot.")
+```
+
+Seasonality describes recurring within-year variation. It is distinct from a long-term trend.
+
+## Long-term trend
+
+```{r}
+fig <- "../outputs/figures/03_annual_trend.png"
+if (file.exists(fig)) knitr::include_graphics(fig) else cat("Run the pipeline to generate the trend plot.")
+```
+
+```{r}
+tab <- "../outputs/tables/trend_results.csv"
+if (file.exists(tab)) knitr::kable(readr::read_csv(tab, show_col_types = FALSE))
+```
+
+Mann–Kendall tests for monotonic association with time; Sen's slope estimates a robust median slope. Serial correlation can affect test calibration, so the result should be treated as a first-pass analysis rather than a final hydrological inference.
+
+## Smooth trend and seasonality
+
+```{r}
+fig <- "../outputs/figures/04_gam_trend_seasonality.png"
+if (file.exists(fig)) knitr::include_graphics(fig) else cat("Run the pipeline to generate the GAM plot.")
+```
+
+The GAM allows a nonlinear smooth over time and a cyclic seasonal effect. The response is transformed as `log(1 + discharge)` to reduce the influence of very high-flow observations.
+
+## Candidate change points
+
+```{r}
+fig <- "../outputs/figures/05_change_points.png"
+if (file.exists(fig)) knitr::include_graphics(fig) else cat("Run the pipeline to generate the change-point plot.")
+```
+
+```{r}
+tab <- "../outputs/tables/change_points.csv"
+if (file.exists(tab)) knitr::kable(readr::read_csv(tab, show_col_types = FALSE))
+```
+
+These are candidate breaks in seasonally adjusted observations. They are not evidence of a specific flood, infrastructure change, or ecological cause. Follow-up work should compare dates with station metadata, known events, and data-quality records.
+
+## Forecast comparison
+
+```{r}
+fig <- "../outputs/figures/06_forecast_holdout.png"
+if (file.exists(fig)) knitr::include_graphics(fig) else cat("Run the pipeline to generate the forecast plot.")
+```
+
+```{r}
+tab <- "../outputs/tables/forecast_metrics.csv"
+if (file.exists(tab)) knitr::kable(readr::read_csv(tab, show_col_types = FALSE))
+```
+
+Forecasts are evaluated on the final chronological holdout. The seasonal-naive model is a necessary baseline: ARIMA should only be considered useful if it improves holdout performance. The current implementation fills missing monthly values for the forecasting demonstration; this simplification should be revisited before any operational use.
+
+## Potential anomalies
+
+```{r}
+fig <- "../outputs/figures/07_anomalies.png"
+if (file.exists(fig)) knitr::include_graphics(fig) else cat("Run the pipeline to generate the anomaly plot.")
+```
+
+An anomaly is an observation unusual relative to the chosen reference pattern, not necessarily an error or an ecological warning. Every flagged observation requires context.
+
+## Limitations and next steps
+
+1. This is a single-site hydrological case study, not an eDNA biodiversity time series.
+2. Discharge is skewed and autocorrelated; trend inference should include sensitivity analyses.
+3. A single-site trend cannot be generalized to all US rivers.
+4. Change-point algorithms can identify statistical shifts without explaining them.
+5. Forecast results depend on data quality, holdout length, and model assumptions.
+6. A biodiversity-focused extension should use repeated species/eDNA observations, account for sampling effort and detectability, and join environmental covariates only when dates/sites align.
+
+## References
+
+- USGS Water Data APIs: <https://api.waterdata.usgs.gov/>
+- `dataRetrieval` package: <https://doi-usgs.github.io/dataRetrieval/>
+- Forecasting: Principles and Practice (Hyndman & Athanasopoulos): <https://otexts.com/fpp3/>

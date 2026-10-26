@@ -1,0 +1,12 @@
+RIVERWATCH — START HERE
+
+1. Install R and RStudio.
+2. Open this folder as your working directory.
+3. Run: source("run_all.R")
+4. Review outputs/figures, outputs/tables, and outputs/RUN_SUMMARY.md.
+5. To render the report, install Quarto and run:
+   quarto render report/analysis_report.qmd --output analysis_report.html
+
+The pipeline downloads public USGS data when run. The ZIP intentionally does not claim
+to include downloaded or analysed observations; those are generated from the live API.
+Read notes/UNDER_THE_HOOD.md before presenting the project or interpreting results.

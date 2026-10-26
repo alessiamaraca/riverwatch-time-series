@@ -1,0 +1,15 @@
+.Rhistory
+.RData
+.Rproj.user/
+.Renviron
+renv/library/
+renv/staging/
+.quarto/
+*_cache/
+*_files/
+.DS_Store
+# Keep downloaded public data out of git by default; publish only if file size/licensing allow.
+data/raw/*.csv
+data/processed/*.csv
+outputs/
+!outputs/.gitkeep
