@@ -11,6 +11,10 @@ jobs:
         with:
           r-version: '4.4'
       - uses: r-lib/actions/setup-pandoc@v2
+      - name: Install Linux system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libuv1-dev libcurl4-openssl-dev libssl-dev libxml2-dev libudunits2-dev libgdal-dev libgeos-dev libproj-dev
       - name: Install packages
         run: Rscript -e 'install.packages(c("testthat","readr","dplyr","lubridate","ggplot2","dataRetrieval","forecast","Kendall","trend","mgcv","changepoint","broom","scales","zoo"), repos="https://cloud.r-project.org")'
       - name: Check source files parse
