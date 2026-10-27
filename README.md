@@ -22,7 +22,7 @@ The analysis focuses on five questions:
 
 The data come from the USGS monitoring station on the Choptank River near Greensboro, Maryland.
 
-| | |
+| Field | Description |
 |---|---|
 | Data source | U.S. Geological Survey (USGS) |
 | Monitoring station | Choptank River near Greensboro, Maryland |
