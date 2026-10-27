@@ -1,37 +1,58 @@
-# RiverWatch: Reproducible Time-Series Analysis of USGS River Discharge
+# RiverWatch: River Discharge Time-Series Analysis in R
 
 [![R project checks](https://github.com/alessiamaraca/riverwatch-time-series/actions/workflows/r-check.yml/badge.svg)](https://github.com/alessiamaraca/riverwatch-time-series/actions/workflows/r-check.yml)
 
-**A portfolio project in R covering ecological time-series methods, trend detection, change points, anomaly screening, and forecasting.**
+An R project exploring long-term trends, seasonal patterns, change points, anomalies, and forecasting in river discharge data from the U.S. Geological Survey (USGS).
 
-> **Scope note:** This first version analyses river discharge, not biodiversity. Discharge is an important hydrological variable, but it is not a direct measure of species richness or ecological condition. The workflow is designed to be reusable later with a real biodiversity/eDNA time series.
+The project uses historical discharge measurements from the Choptank River in Maryland. I developed the workflow to practise time-series methods commonly used in environmental data analysis and to build a reproducible approach that could later be adapted to ecological datasets, including biodiversity and eDNA monitoring data.
+
+For now, the analysis focuses on river discharge rather than biodiversity. Discharge provides useful information about hydrological conditions, but it cannot be used on its own to assess biodiversity or ecosystem health.
 
 ## Research questions
 
-1. What seasonal pattern is visible in mean monthly river discharge?
-2. Is there evidence of a long-term trend in annual mean discharge?
-3. Are there candidate shifts in seasonally adjusted monthly discharge?
-4. Can a seasonal ARIMA model forecast monthly discharge better than a seasonal-naive baseline?
-5. Which months look unusual relative to a smooth trend and seasonal pattern?
+The analysis focuses on five questions:
 
-## Public data
+1. How does river discharge vary throughout the year?
+2. Has mean annual discharge changed over time?
+3. Are there detectable shifts in the monthly discharge series?
+4. How well can seasonal ARIMA models predict monthly discharge compared with a simple seasonal baseline?
+5. Which months show unusually high or low discharge relative to the expected seasonal pattern?
 
-- **Provider:** U.S. Geological Survey (USGS)
-- **Site:** Choptank River near Greensboro, Maryland
-- **USGS monitoring location ID:** `USGS-01491000`
-- **Parameter:** mean daily discharge (`00060`, statistic `00003`)
-- **Units:** USGS-reported discharge units; typically cubic feet per second (`ft^3/s`)
-- **Access:** modern USGS Water Data API through the USGS-maintained R package `dataRetrieval`
-- **API documentation:** https://api.waterdata.usgs.gov/
-- **R package documentation:** https://doi-usgs.github.io/dataRetrieval/
+## Data
 
-The script downloads the latest available record when you run it. The exact date range, retrieval timestamp, and row counts are written to `outputs/tables/data_manifest.csv`.
+The data come from the USGS monitoring station on the Choptank River near Greensboro, Maryland.
 
-## Quick start
+| | |
+|---|---|
+| Data source | U.S. Geological Survey (USGS) |
+| Monitoring station | Choptank River near Greensboro, Maryland |
+| Station ID | `01491000` |
+| Variable | Mean daily discharge |
+| Parameter code | `00060` |
+| Statistic code | `00003` |
+| Units | Cubic feet per second (ft³/s) |
+| Period analysed | January 1948 – October 2026 |
 
-1. Install R (4.3 or later recommended) and RStudio.
-2. Open this folder as an RStudio project, or set it as your working directory.
-3. Run:
+Daily observations are downloaded using the USGS `dataRetrieval` R package.
+
+The script retrieves the latest available data each time it runs. Information about the download, including dates and number of observations, is saved in `outputs/tables/data_manifest.csv`.
+
+Useful links:
+
+- [USGS Water Data API](https://api.waterdata.usgs.gov/)
+- [dataRetrieval documentation](https://doi-usgs.github.io/dataRetrieval/)
+
+## Running the analysis
+
+The project was developed in R. R version 4.3 or later is recommended.
+
+After downloading the repository, open the project in RStudio and run:
+
+```r
+source("run_all.R")
+```
+
+Alternatively, the scripts can be run individually:
 
 ```r
 source("R/00_setup.R")
@@ -45,103 +66,121 @@ source("R/07_anomalies.R")
 source("R/08_make_summary.R")
 ```
 
-Or run the entire pipeline:
+The first run requires an internet connection to download the USGS data and install any missing R packages.
 
-```r
-source("run_all.R")
-```
+## Analysis methods
 
-The first run requires internet access to the public USGS API and may install missing R packages. No API key should be needed for this modest, single-site request, although USGS rate limits and service availability can change.
+The workflow includes:
 
-## Main outputs
+- Data cleaning, quality checks, and aggregation of daily observations into monthly and annual means
+- Exploratory plots and seasonal decomposition (STL)
+- Mann–Kendall test and Sen's slope for long-term trends
+- Generalized additive models (GAMs) to examine smooth temporal trends and seasonality
+- PELT change-point detection on seasonally adjusted monthly discharge
+- Seasonal ARIMA forecasting, evaluated against a seasonal-naive model
+- Anomaly detection using the median absolute deviation (MAD)
 
-- `outputs/figures/01_daily_discharge.png`
-- `outputs/figures/02_monthly_seasonality.png`
-- `outputs/figures/03_annual_trend.png`
-- `outputs/figures/04_gam_trend_seasonality.png`
-- `outputs/figures/05_change_points.png`
-- `outputs/figures/06_forecast_holdout.png`
-- `outputs/figures/07_anomalies.png`
-- `outputs/tables/trend_results.csv`
-- `outputs/tables/change_points.csv`
-- `outputs/tables/forecast_metrics.csv`
-- `outputs/tables/anomalies.csv`
-- `outputs/tables/data_manifest.csv`
-- `report/analysis_report.html` (after rendering the Quarto report)
+## Results
 
-## Methods
+The results below are from the analysis run in October 2026, using 28,788 daily observations collected between January 1, 1948, and October 26, 2026.
 
-- Data-quality checks and monthly/annual aggregation
-- Exploratory time-series plots
-- Seasonal summaries and STL decomposition
-- Mann–Kendall trend test and Sen's slope on annual means
-- Generalized additive model (GAM) for smooth long-term trend plus cyclic seasonality
-- PELT change-point screening on seasonally adjusted anomalies
-- Seasonal ARIMA forecast compared with seasonal-naive baseline using a chronological holdout
-- Robust anomaly screening using median absolute deviation
-  
-## Results from the October 2026 analysis
+### Seasonal variation
 
-The workflow was successfully executed using publicly available daily discharge observations from USGS monitoring site `01491000` (Choptank River near Greensboro, Maryland).
+Discharge follows a clear seasonal pattern. Flows are generally higher during late winter and early spring, while lower values are more common in late summer and early autumn.
 
-**Data coverage:** 28,788 daily observations were retrieved for the period January 1, 1948, to October 26, 2026. The final year is incomplete and should be interpreted accordingly.
+There is also considerable variation between individual days, including occasional high-discharge events.
 
-### Seasonal patterns
+![Monthly discharge seasonality](outputs/figures/02_monthly_seasonality.png)
 
-River discharge exhibits pronounced seasonality, with generally higher monthly discharge in late winter and early spring and lower discharge during late summer and early autumn. Daily observations also show substantial variability and occasional high-flow events.
+### Long-term trends
 
-### Long-term trend
+I used the Mann–Kendall test to assess whether annual mean discharge showed a consistent trend over time.
 
-The Mann–Kendall test on annual mean discharge produced a positive but statistically non-significant trend at the 5% significance level:
+The results were:
 
-- Mann–Kendall tau: **0.1282**
-- p-value: **0.09533**
-- Sen's slope: **+0.45115 discharge units per year**
+| Statistic | Result |
+|---|---:|
+| Mann–Kendall tau | 0.1282 |
+| p-value | 0.09533 |
+| Sen's slope | +0.45115 ft³/s per year |
 
-These results suggest a weak positive tendency, but do not provide sufficient evidence to conclude that a statistically significant monotonic trend exists at the conventional 5% threshold.
+The positive Sen's slope suggests a slight increase in annual mean discharge over the study period. However, the Mann–Kendall test was not statistically significant at the 0.05 level.
 
-### Change-point screening
-
-The PELT-based screening procedure did not select any candidate change points in the seasonally adjusted monthly series under the settings used. This does not rule out gradual changes or shifts detectable using alternative methods.
-
-### Forecast evaluation
-
-A seasonal ARIMA model was evaluated against a seasonal-naive baseline using a chronological holdout period.
-
-| Model | MAE | RMSE | MAPE |
-|---|---:|---:|---:|
-| Seasonal-naive baseline | 145.0 | 225.0 | 368% |
-| Auto ARIMA/SARIMA | 70.5 | 81.2 | 249% |
-
-The ARIMA/SARIMA model achieved lower prediction errors than the baseline, although forecast accuracy remained limited during periods of strong discharge variability. Percentage-based errors should be interpreted cautiously when observed discharge is close to zero.
-
-### Anomaly screening
-
-Robust anomaly screening highlighted a small number of unusual monthly observations relative to the estimated seasonal and long-term patterns. These observations are statistical flags requiring further investigation, not confirmed flood events or evidence of particular environmental causes.
-
-### Scientific scope
-
-This analysis demonstrates reproducible hydrological time-series methods using one USGS monitoring location. The findings should not be interpreted as direct evidence of biodiversity change, ecological degradation, or climate-change causation. Further analyses would require appropriate environmental covariates, station-history checks, and biodiversity observations.
-
-## Selected visualizations
-
-### Monthly seasonality
-
-![Monthly seasonality](outputs/figures/02_monthly_seasonality.png)
-
-### Annual discharge trend
+There is therefore some indication of an upward tendency, but not enough evidence to establish a significant long-term monotonic trend.
 
 ![Annual discharge trend](outputs/figures/03_annual_trend.png)
 
-### Forecast evaluation
+### Change-point detection
+
+I applied the PELT algorithm to the seasonally adjusted monthly discharge series to look for potential changes in its statistical behaviour.
+
+No change points were identified with the settings used in this analysis.
+
+This result depends on the method and penalty settings and does not necessarily mean that the river's discharge regime has remained unchanged.
+
+### Forecasting
+
+I compared a seasonal ARIMA model with a seasonal-naive baseline using a chronological training and test split.
+
+| Model | MAE | RMSE | MAPE |
+|---|---:|---:|---:|
+| Seasonal naive | 145.0 | 225.0 | 368% |
+| ARIMA/SARIMA | 70.5 | 81.2 | 249% |
+
+The ARIMA model performed better than the seasonal-naive baseline on the test period, with lower MAE and RMSE values.
+
+However, forecasting river discharge remains difficult because of its variability, particularly during periods of unusually high or low flow.
+
+The high MAPE values also need to be interpreted carefully, as percentage errors can become very large when observed discharge is close to zero.
 
 ![Forecast comparison](outputs/figures/06_forecast_holdout.png)
 
-## Interpretation cautions
+### Unusual observations
 
-- A detected trend is not automatically an ecological impact.
-- Monthly and annual averages can hide extremes; daily discharge has a skewed distribution.
-- Trend tests can be sensitive to autocorrelation. The report includes this limitation and encourages sensitivity checks.
-- Change points are candidate statistical breaks, not proof of a specific event or cause.
-- Forecast performance is evaluated out of sample. Do not select a model based only on in-sample fit.
-- This is hydrological time-series practice. To make the next version directly biodiversity-focused, repeat the workflow on a suitable repeated-sampling eDNA/species dataset and include sampling effort and detection limitations.
+I used a robust anomaly-detection method to identify months with discharge values that differed substantially from the estimated trend and seasonal pattern.
+
+A small number of months were flagged as unusual.
+
+These observations may be worth investigating further, but the statistical analysis alone cannot determine whether they correspond to floods, droughts, measurement issues, or other environmental events.
+
+## Outputs
+
+Figures generated by the workflow are saved in `outputs/figures/`:
+
+```text
+01_daily_discharge.png
+02_monthly_seasonality.png
+03_annual_trend.png
+04_gam_trend_seasonality.png
+05_change_points.png
+06_forecast_holdout.png
+07_anomalies.png
+```
+
+Results and supporting information are saved in `outputs/tables/`:
+
+```text
+trend_results.csv
+change_points.csv
+forecast_metrics.csv
+anomalies.csv
+data_manifest.csv
+```
+
+A more detailed analysis is also available in the Quarto report, which can be rendered to:
+
+`report/analysis_report.html`
+
+## Limitations and next steps
+
+This analysis uses data from a single monitoring station, so the results should not be generalized to other rivers without further investigation.
+
+A few aspects would be worth exploring in future work:
+
+- Testing how autocorrelation affects the trend results
+- Examining extreme discharge events separately from monthly and annual averages
+- Including precipitation, temperature, or other environmental variables
+- Comparing discharge patterns across multiple monitoring stations
+- Applying the same workflow to biodiversity or eDNA time-series data
+
+The main aim of RiverWatch is to provide a practical, reproducible example of environmental time-series analysis in R. It is also a starting point for more detailed ecological analyses using appropriate biological observations.
